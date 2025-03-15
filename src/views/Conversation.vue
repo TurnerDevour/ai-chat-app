@@ -1,7 +1,10 @@
 <template>
-  {{ route }}
+  <div v-if="conversation" class="h-[10%] bg-gray-200 border-b border-gray-300 flex items-center px-3 justify-between">
+    <h3 class="font-semibold  text-gray-900">{{ conversation.title }}</h3>
+    <span class="text-sm text-gray-500">{{ conversation.updatedAt }}</span>
+  </div>
   <div class="w-[80%] mx-auto h-[85%] overflow-y-auto pt-2">
-    <MessageList :messages="messages" />
+    <MessageList :messages="filteredMessages" />
   </div>
   <div class="w-[80%] mx-auto h-[15%] flex items-center">
     <MessageInput />
@@ -9,28 +12,25 @@
 </template>
 
 <script setup lang="ts">
-import { MessageProps } from '../types'
+import { messages, conversations } from '../testData'
+import { MessageProps, ConversationProps } from '../types'
 import MessageInput from '../components/MessageInput.vue'
 import MessageList from '../components/MessageList.vue'
 import { useRoute } from 'vue-router'
+import { ref, watch } from 'vue'
+const filteredMessages = ref<MessageProps[]>([])
+const conversation = ref<ConversationProps>()
 const route = useRoute()
-const conversationId = Number(route.params.id)
-const messages: MessageProps[] = [
-  { id: 1, content: '什么是光合作用', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'question', conversationId: 1 },
-  { id: 2, content: '你的说法很请正确，理解的很不错,你的说法很请正确，理解的很不错', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'answer', conversationId: 1 },
-  { id: 3, content: '请告诉我更多', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'question', conversationId: 1 },
-  { id: 4, content: '你的说法很请正确，理解的很不错,你的说法很请正确，理解的很不错', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'answer', conversationId: 1 },
-  { id: 5, content: '还有更多的信息吗', createdAt: '2024-07-03', type: 'question', updatedAt: '2024-07-03', conversationId: 1 },
-  { id: 6, content: '', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'answer', status: 'loading', conversationId: 1 },
-  { id: 7, content: '什么是光合作用', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'question', conversationId: 2 },
-  { id: 8, content: '你的说法很请正确，理解的很不错,你的说法很请正确，理解的很不错', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'answer', conversationId: 2 },
-  { id: 9, content: '请告诉我更多', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'question', conversationId: 2 },
-  { id: 10, content: '你的说法很请正确，理解的很不错,你的说法很请正确，理解的很不错', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'answer', conversationId: 2 },
-  { id: 11, content: '还有更多的信息吗', createdAt: '2024-07-03', type: 'question', updatedAt: '2024-07-03', conversationId: 3 },
-  { id: 12, content: '', createdAt: '2024-07-03', updatedAt: '2024-07-03', type: 'answer', status: 'loading', conversationId: 3 },
-]
+let conversationId = parseInt(route.params.id as string)
+filteredMessages.value = messages.filter((message) => message.conversationId === conversationId)
+conversation.value = conversations.find((conversation) => conversation.id === conversationId)
+
 // 过滤出当前会话的消息
-const filteredMessages = messages.filter((message) => message.conversationId === conversationId)
+watch(() => route.params.id, (newId: string) => {
+  conversationId = parseInt(newId)
+  filteredMessages.value = messages.filter((message) => message.conversationId === conversationId)
+  conversation.value = conversations.find((conversation) => conversation.id === conversationId)
+})
 </script>
 
 <style scoped></style>
