@@ -5,7 +5,7 @@ import { createRouter, createMemoryHistory, RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home },
-  { path: '/conversation', component: Conversation },
+  { path: '/conversation/:id', component: Conversation },
   { path: '/setting', component: Setting }
 ];
 
